@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collab</title>
+</head>
+<body>
+<h2 style="color:blue;">Project Under Development</h2>
+<!--Navigation Links from other Components-->
+<nav>
+  <a routerLink="/login">Login</a> | 
+  <a routerLink="/dashboard">Dashboard</a>
+</nav>
+<button style="color: aqua ; shape-margin: 10%;" (click)="Button()">Click Me</button>
+<p>Count: {{count}}</p>
+
+<input type="text" [(ngModel)]="username" placeholder="Enter your name">
+<p>Hello, {{username}}!</p>
+<router-outlet></router-outlet>
+</body>
+</html>
