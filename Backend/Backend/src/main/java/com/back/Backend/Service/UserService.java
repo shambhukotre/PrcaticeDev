@@ -27,6 +27,7 @@ public class UserService {
         users.add(new User(13L, "Manish", "manish@gmail.com"));
         users.add(new User(14L, "Kavita", "kavita@gmail.com"));
         users.add(new User(15L, "Sanjay", "sanjay@gmail.com"));
+        users.add(new User(16L, "Ritu", "Ritu@yaho.com"));
 
 
     }
