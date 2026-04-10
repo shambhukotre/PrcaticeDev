@@ -31,4 +31,11 @@ createUser(user: any): Observable<any> {
   return this.httpClient.post(this.apiUrl, user);
 }
 
+updateUser(id: number, user: any): Observable<any> {
+  return this.httpClient.put(`${this.apiUrl}/${id}`, user);
+}
+
+deleteUser(id: number): Observable<any> {
+  return this.httpClient.delete(`${this.apiUrl}/${id}`);
+}
 }

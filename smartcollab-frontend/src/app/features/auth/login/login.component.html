@@ -164,22 +164,6 @@
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="id" class="form-label">ID</label>
-          <input
-            type="number"
-            id="id"
-            name="id"
-            [(ngModel)]="newUser.id"
-            required
-            #idCtrl="ngModel"
-            class="form-control"
-            [class.is-invalid]="idCtrl.invalid && (idCtrl.touched || idCtrl.dirty)"
-          />
-          <div class="invalid-feedback" *ngIf="idCtrl.invalid && (idCtrl.touched || idCtrl.dirty)">
-            Enter ID
-          </div>
-        </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
@@ -198,8 +182,81 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100" [disabled]="userForm.invalid">Create User</button>
+        <button type="submit" class="btn btn-primary w-100" [disabled]="userForm.invalid || loadingCreate">Create User</button>
+        <div class="alert alert-info mt-3" *ngIf="loadingCreate">Creating user...</div>
       </form>
     </div>
   </div>
 </div>
+
+
+<div class="container mt-5 mb-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2 class="mb-4">Update User</h2>
+      <form #updateForm="ngForm" (ngSubmit)="updateUser()" novalidate>
+        <div class="mb-3">
+          <label for="updateId" class="form-label">ID</label>
+          <input
+            type="number"
+            id="updateId"
+            name="updateId"
+            [(ngModel)]="userId"
+            required
+            #updateIdCtrl="ngModel"
+            class="form-control"
+            [class.is-invalid]="updateIdCtrl.invalid && (updateIdCtrl.touched || updateIdCtrl.dirty)"
+          />
+          <div class="invalid-feedback" *ngIf="updateIdCtrl.invalid && (updateIdCtrl.touched || updateIdCtrl.dirty)">
+            Enter ID
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input      
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="updatedUser.name"
+            required
+            #nameCtrl="ngModel"
+            class="form-control"
+            [class.is-invalid]="nameCtrl.invalid && (nameCtrl.touched || nameCtrl.dirty)"
+          />
+          <div class="invalid-feedback" *ngIf="nameCtrl.invalid && (nameCtrl.touched || nameCtrl.dirty)">
+            Enter name
+          </div>
+        </div>    
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="updatedUser.email"
+            required
+            #emailCtrl="ngModel"
+            class="form-control"
+            [class.is-invalid]="emailCtrl.invalid && (emailCtrl.touched || emailCtrl.dirty)"
+          />
+          <div class="invalid-feedback" *ngIf="emailCtrl.invalid && (emailCtrl.touched || emailCtrl.dirty)">
+            Enter email 
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100" [disabled]="updateForm.invalid || loading">Update User</button>
+        <div class="alert alert-info mt-3" *ngIf="loading"|async>Updating user...</div>
+      </form>
+    </div>
+
+<h2>Delete User</h2>
+<div class="input-group mb-3">
+  <input 
+    type="number" 
+    [(ngModel)]="deleteUserId" 
+    placeholder="Enter ID"
+    class="form-control"
+  />
+  <button class="btn btn-danger" (click)="deleteUser(deleteUserId)" [disabled]="!deleteUserId || loadingDelete">Delete User</button>
+</div>
+<div class="alert alert-info" *ngIf="loadingDelete">Deleting user...</div>  
