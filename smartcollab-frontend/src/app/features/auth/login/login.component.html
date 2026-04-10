@@ -164,22 +164,6 @@
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="id" class="form-label">ID</label>
-          <input
-            type="number"
-            id="id"
-            name="id"
-            [(ngModel)]="newUser.id"
-            required
-            #idCtrl="ngModel"
-            class="form-control"
-            [class.is-invalid]="idCtrl.invalid && (idCtrl.touched || idCtrl.dirty)"
-          />
-          <div class="invalid-feedback" *ngIf="idCtrl.invalid && (idCtrl.touched || idCtrl.dirty)">
-            Enter ID
-          </div>
-        </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>

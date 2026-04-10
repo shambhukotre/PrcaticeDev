@@ -1,29 +1,64 @@
 package com.back.Backend.Service;
 
 import com.back.Backend.Model.User;
+import com.back.Backend.Repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Spy;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Spy
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private UserService userService;
 
+    private List<User> mockUsers;
+
     @BeforeEach
     void setUp() {
-        // Reset mocks before each test
-        reset(userService);
+        mockUsers = List.of(
+            new User(1L, "Shambhu", "shambhu@test.com"),
+            new User(2L, "Rahul", "rahul@gmail.com"),
+            new User(3L, "Suresh", "Suresh@gmail.com"),
+            new User(4L, "Ramesh", "Ramesh@gmail.com"),
+            new User(5L, "Amit", "amit@gmail.com"),
+            new User(6L, "Priya", "priya@gmail.com"),
+            new User(7L, "Vikram", "vikram@gmail.com"),
+            new User(8L, "Neha", "neha@gmail.com"),
+            new User(9L, "Rajesh", "rajesh@gmail.com"),
+            new User(10L, "Anjali", "anjali@gmail.com"),
+            new User(11L, "Sunil", "sunil@gmail.com"),
+            new User(12L, "Pooja", "pooja@test.com"),
+            new User(13L, "Manish", "manish@gmail.com"),
+            new User(14L, "Kavita", "kavita@gmail.com"),
+            new User(15L, "Sanjay", "sanjay@gmail.com"),
+            new User(16L, "Ritu", "Ritu@yaho.com")
+        );
+
+        when(userRepository.findAll()).thenReturn(mockUsers);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUsers.get(0)));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(mockUsers.get(4)));
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        when(userRepository.findById(null)).thenReturn(Optional.empty());
+        when(userRepository.findById(-1L)).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.existsById(999L)).thenReturn(false);
+        when(userRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(anyString(), anyString())).thenReturn(mockUsers);
     }
 
     // Tests for getAllUsers()
@@ -32,7 +67,7 @@ class UserServiceTest {
         List<User> users = userService.getAllUsers();
         assertEquals(15, users.size(), "Should return 15 dummy users");
         
-        verify(userService, times(1)).getAllUsers();
+        verify(userRepository, times(1)).findAll();
     }
 
     @Test
@@ -40,7 +75,7 @@ class UserServiceTest {
         List<User> users = userService.getAllUsers();
         assertFalse(users.isEmpty(), "Users list should not be empty");
         
-        verify(userService, times(1)).getAllUsers();
+        verify(userRepository, times(1)).findAll();
     }
 
     @Test
@@ -50,7 +85,7 @@ class UserServiceTest {
         assertNotSame(users1, users2, "Should return a copy, not the original list");
         assertEquals(users1.size(), users2.size(), "Both lists should have same size");
         
-        verify(userService, times(2)).getAllUsers();
+        verify(userRepository, times(2)).findAll();
     }
 
     // Tests for getUserById()
@@ -59,9 +94,9 @@ class UserServiceTest {
         User user = userService.getUserById(1L);
         assertNotNull(user, "User with id 1 should exist");
         assertEquals("Shambhu", user.getName());
-        assertEquals("shambhu@gmail.com", user.getEmail());
+        assertEquals("shambhu@test.com", user.getEmail());
         
-        verify(userService, times(1)).getUserById(1L);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -69,7 +104,7 @@ class UserServiceTest {
         User user = userService.getUserById(999L);
         assertNull(user, "User with id 999 should not exist");
         
-        verify(userService, times(1)).getUserById(999L);
+        verify(userRepository, times(1)).findById(999L);
     }
 
     @Test
@@ -77,7 +112,7 @@ class UserServiceTest {
         User user = userService.getUserById(null);
         assertNull(user, "Should return null when id is null");
         
-        verify(userService, times(1)).getUserById(null);
+        verify(userRepository, times(1)).findById(null);
     }
 
     @Test
@@ -86,7 +121,7 @@ class UserServiceTest {
         assertNotNull(user);
         assertEquals("Amit", user.getName());
         
-        verify(userService, times(1)).getUserById(5L);
+        verify(userRepository, times(1)).findById(5L);
     }
 
     @Test
@@ -94,7 +129,7 @@ class UserServiceTest {
         User user = userService.getUserById(-1L);
         assertNull(user, "Should return null for negative id");
         
-        verify(userService, times(1)).getUserById(-1L);
+        verify(userRepository, times(1)).findById(-1L);
     }
 
     // Tests for addUser()
@@ -106,7 +141,7 @@ class UserServiceTest {
         assertNotNull(addedUser, "Added user should not be null");
         assertEquals(newUser, addedUser, "Should return the added user");
         
-        verify(userService, times(1)).addUser(newUser);
+        verify(userRepository, times(1)).save(newUser);
     }
 
     @Test
@@ -122,8 +157,8 @@ class UserServiceTest {
         List<User> users = userService.getAllUsers();
         assertEquals(initialSize + 2, users.size(), "Should have 2 more users");
         
-        verify(userService, times(1)).addUser(user1);
-        verify(userService, times(1)).addUser(user2);
+        verify(userRepository, times(1)).save(user1);
+        verify(userRepository, times(1)).save(user2);
     }
 
     @Test
@@ -133,7 +168,7 @@ class UserServiceTest {
 
         assertNotNull(addedUser, "User with null properties should still be added");
         
-        verify(userService, times(1)).addUser(userWithNulls);
+        verify(userRepository, times(1)).save(userWithNulls);
     }
 
     @Test
@@ -142,7 +177,7 @@ class UserServiceTest {
             userService.addUser(null);
         }, "Should not throw exception when adding null user");
         
-        verify(userService, times(1)).addUser(null);
+        verify(userRepository, times(1)).save(null);
     }
 
     // Tests for updateUser()
@@ -155,7 +190,7 @@ class UserServiceTest {
         assertEquals("UpdatedShambhu", updatedUser.getName());
         assertEquals("updated@gmail.com", updatedUser.getEmail());
         
-        verify(userService, times(1)).updateUser(1L, updateData);
+        verify(userRepository, times(1)).save(updatedUser);
     }
 
     @Test
@@ -165,7 +200,7 @@ class UserServiceTest {
 
         assertNull(result, "Should return null when user doesn't exist");
         
-        verify(userService, times(1)).updateUser(999L, updateData);
+        verify(userRepository, times(1)).save(updateData);
     }
 
     @Test
@@ -175,7 +210,7 @@ class UserServiceTest {
 
         assertNull(result, "Should return null when id is null");
         
-        verify(userService, times(1)).updateUser(null, updateData);
+        verify(userRepository, times(1)).save(updateData);
     }
 
     @Test
@@ -184,7 +219,7 @@ class UserServiceTest {
             userService.updateUser(1L, null);
         }, "Should throw NullPointerException when update data is null");
         
-        verify(userService, times(1)).updateUser(1L, null);
+        verify(userRepository, times(1)).save(null);
     }
 
     @Test
@@ -198,7 +233,7 @@ class UserServiceTest {
         assertEquals("newemail@gmail.com", afterUpdate.getEmail());
         assertEquals(userId, afterUpdate.getId(), "ID should remain unchanged");
         
-        verify(userService, times(1)).updateUser(userId, updateData);
+        verify(userRepository, times(1)).save(afterUpdate);
     }
 
     @Test
@@ -210,7 +245,7 @@ class UserServiceTest {
         assertEquals("", result.getName());
         assertEquals("", result.getEmail());
         
-        verify(userService, times(1)).updateUser(1L, updateData);
+        verify(userRepository, times(1)).save(result);
     }
 
     // Tests for deleteUser()
@@ -226,7 +261,7 @@ class UserServiceTest {
         User userAfter = userService.getUserById(userIdToDelete);
         assertNull(userAfter, "User should not exist after deletion");
         
-        verify(userService, times(1)).deleteUser(userIdToDelete);
+        verify(userRepository, times(1)).deleteById(userIdToDelete);
     }
 
     @Test
@@ -234,7 +269,7 @@ class UserServiceTest {
         boolean deleted = userService.deleteUser(999L);
         assertFalse(deleted, "Should return false when user doesn't exist");
         
-        verify(userService, times(1)).deleteUser(999L);
+        verify(userRepository, times(1)).deleteById(999L);
     }
 
     @Test
@@ -242,7 +277,7 @@ class UserServiceTest {
         boolean deleted = userService.deleteUser(null);
         assertFalse(deleted, "Should return false when id is null");
         
-        verify(userService, times(1)).deleteUser(null);
+        verify(userRepository, times(1)).deleteById(null);
     }
 
     @Test
@@ -255,8 +290,8 @@ class UserServiceTest {
         List<User> users = userService.getAllUsers();
         assertEquals(initialSize - 2, users.size(), "Should have 2 fewer users");
         
-        verify(userService, times(1)).deleteUser(1L);
-        verify(userService, times(1)).deleteUser(2L);
+        verify(userRepository, times(1)).deleteById(1L);
+        verify(userRepository, times(1)).deleteById(2L);
     }
 
     @Test
@@ -267,7 +302,7 @@ class UserServiceTest {
         assertTrue(firstDelete, "First delete should succeed");
         assertFalse(secondDelete, "Second delete should fail");
         
-        verify(userService, times(2)).deleteUser(14L);
+        verify(userRepository, times(2)).deleteById(14L);
     }
 
     // Tests for searchUsers()
@@ -277,7 +312,7 @@ class UserServiceTest {
         assertFalse(results.isEmpty(), "Should find users matching name");
         assertTrue(results.stream().anyMatch(u -> u.getName().contains("Amit")));
         
-        verify(userService, times(1)).searchUsers("Amit", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("Amit", "");
     }
 
     @Test
@@ -285,7 +320,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("gmail", "");
         assertFalse(results.isEmpty(), "Should find users with 'gmail' in email via query parameter");
         
-        verify(userService, times(1)).searchUsers("gmail", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("gmail", "");
     }
 
     @Test
@@ -293,7 +328,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("Raj", "");
         assertFalse(results.isEmpty(), "Should find users with partial name match");
         
-        verify(userService, times(1)).searchUsers("Raj", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("Raj", "");
     }
 
     @Test
@@ -301,7 +336,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("", "gmail");
         assertFalse(results.isEmpty(), "Should find users with partial email match");
         
-        verify(userService, times(1)).searchUsers("", "gmail");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("", "gmail");
     }
 
     @Test
@@ -309,7 +344,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("NonExistentUser", "");
         assertTrue(results.isEmpty(), "Should return empty list when no match");
         
-        verify(userService, times(1)).searchUsers("NonExistentUser", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("NonExistentUser", "");
     }
 
     @Test
@@ -318,7 +353,7 @@ class UserServiceTest {
         assertFalse(results.isEmpty(), "Should return all users when search query is empty string");
         assertEquals(userService.getAllUsers().size(), results.size());
         
-        verify(userService, times(1)).searchUsers("", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("", "");
     }
 
     @Test
@@ -331,9 +366,9 @@ class UserServiceTest {
         assertFalse(resultsUpper.isEmpty(), "Uppercase search should work");
         assertFalse(resultsMixed.isEmpty(), "Mixed case search should work");
         
-        verify(userService, times(1)).searchUsers("amit", "");
-        verify(userService, times(1)).searchUsers("AMIT", "");
-        verify(userService, times(1)).searchUsers("AmIt", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("amit", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("AMIT", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("AmIt", "");
     }
 
     @Test
@@ -342,7 +377,7 @@ class UserServiceTest {
             userService.searchUsers(null, "");
         }, "Should throw NullPointerException for null query");
         
-        verify(userService, times(1)).searchUsers(null, "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(null, "");
     }
 
     @Test
@@ -351,7 +386,7 @@ class UserServiceTest {
         assertFalse(results.isEmpty(), "Should find results even with null email since email parameter is unused");
         assertTrue(results.stream().anyMatch(u -> u.getName().contains("Amit")));
         
-        verify(userService, times(1)).searchUsers("Amit", null);
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("Amit", null);
     }
 
     @Test
@@ -359,7 +394,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("a", "");
         assertTrue(results.size() > 1, "Should return multiple matches");
         
-        verify(userService, times(1)).searchUsers("a", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("a", "");
     }
 
     @Test
@@ -367,7 +402,7 @@ class UserServiceTest {
         List<User> results = userService.searchUsers("h", "");
         assertFalse(results.isEmpty(), "Should find users matching the search criteria");
         
-        verify(userService, times(1)).searchUsers("h", "");
+        verify(userRepository, times(1)).findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase("h", "");
     }
 }
 

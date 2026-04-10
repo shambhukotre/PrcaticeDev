@@ -61,7 +61,6 @@ searchUsers() {
 newUser: any = {
   name: '',
   email: '',
-  id : ''
 }
 createUser() {
   this.loadingCreate = true;
